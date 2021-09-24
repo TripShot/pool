@@ -49,7 +49,7 @@ import Control.Concurrent (ThreadId, forkIOWithUnmask, killThread, myThreadId, t
 import Control.Concurrent.STM
 import Control.Exception (SomeException, onException, mask_)
 import Control.Monad (forM_, forever, join, liftM5, unless, when)
-import Data.Hashable (hash)
+import Data.Hashable (hashWithSalt)
 import Data.IORef (IORef, newIORef, mkWeakIORef)
 import Data.List (partition)
 import Data.Time.Clock (NominalDiffTime, UTCTime, diffUTCTime, getCurrentTime)
@@ -380,7 +380,7 @@ tryTakeResource pool@Pool{..} = do
 -- Internal, just to not repeat code for 'takeResource' and 'tryTakeResource'
 getLocalPool :: Pool a -> IO (LocalPool a)
 getLocalPool Pool{..} = do
-  i <- liftBase $ ((`mod` numStripes) . hash) <$> myThreadId
+  i <- liftBase $ ((`mod` numStripes) . hashWithSalt (-3750763034362895579)) <$> myThreadId
   return $ localPools V.! i
 #if __GLASGOW_HASKELL__ >= 700
 {-# INLINABLE getLocalPool #-}
